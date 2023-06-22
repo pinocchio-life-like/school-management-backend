@@ -5,7 +5,6 @@ const calenderYears = require("../controllers/CalenderYearController/calender-ye
 
 CalenderYear.get("/calender/calenderList", calenderYears.calenderList);
 CalenderYear.post("/calender/individual", calenderYears.admitIndividual);
-CalenderYear.post("/calender/multiple", calenderYears.admitMultiple);
 CalenderYear.post("/calender/expel", calenderYears.expelIndividual);
 // CalenderYear.delete("/calender/classList/:id", calenderYears.deleteClasses);
 

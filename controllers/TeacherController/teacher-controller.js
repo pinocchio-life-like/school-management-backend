@@ -1,6 +1,7 @@
 const HttpError = require("../../models/http-error");
 const Teacher = require("../../models/teacherDB");
 const Course = require("../../models/courseDB");
+const Attending = require("../../models/attendingDB");
 
 const getTeachers = async (req, res, next) => {
   let teachers;
@@ -96,6 +97,60 @@ const registerTeachers = async (req, res, next) => {
   }
 };
 
+const getAttending = async (req, res, next) => {
+  let attenders;
+  try {
+    attenders = await Attending.find();
+  } catch (err) {
+    res.send(new HttpError("Check your Internet Connection", 404));
+    return;
+  }
+  res.status(201).json({
+    attenders: attenders.map((attenders) =>
+      attenders.toObject({ getters: true })
+    ),
+  });
+};
+
+const setAttending = async (req, res, next) => {
+  const { grade, teacherId, teacherName } = req.body;
+  const attenders = new Attending({
+    grade: grade,
+    teacherId: teacherId,
+    teacherName: teacherName,
+  });
+
+  try {
+    const existingAttender = await Attending.findOne({
+      teacherId: teacherId,
+    });
+
+    if (!existingAttender) {
+      await attenders.save();
+      res
+        .status(201)
+        .json({ attenders: attenders.toObject({ getters: true }) });
+      return;
+    }
+    res.status(404).json({ message: "Attender Already Exists", code: 404 });
+  } catch (err) {
+    res
+      .status(404)
+      .json({ message: "Check your internet and try again!", code: 404 });
+  }
+};
+const deleteAttender = async (req, res, next) => {
+  try {
+    await Attending.deleteOne({ teacherId: req.params.id });
+    res.status(201).json({ deleted: "successfull" });
+  } catch (err) {
+    res.send(new HttpError("Couldnt delete teacher", 404));
+  }
+};
+
+exports.deleteAttender = deleteAttender;
+exports.getAttending = getAttending;
+exports.setAttending = setAttending;
 exports.getTeachers = getTeachers;
 exports.deleteTeachers = deleteTeachers;
 exports.registerTeachers = registerTeachers;

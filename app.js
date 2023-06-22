@@ -9,11 +9,13 @@ const calenderRouter = require("./Routes/calender-year-route");
 const attendanceRouter = require("./Routes/attendance-route");
 const app = express();
 const cors = require("cors");
+const path = require("path");
 const teacherRouter = require("./Routes/teacher-route");
 const markRouter = require("./Routes/mark-route");
 const feeRouter = require("./Routes/fee-route");
 const jobRouter = require("./Routes/job-route");
 const employeeRouter = require("./Routes/employee-route");
+const payrollRouter = require("./Routes/payroll-route");
 
 // app.use(bodyParser.urlencoded({ extended: false }));
 app.use(
@@ -46,6 +48,23 @@ app.use(markRouter);
 app.use(feeRouter);
 app.use(jobRouter);
 app.use(employeeRouter);
+app.use(payrollRouter);
+
+app.use("/uploads/resume", express.static(path.join("uploads", "resume")));
+
+app.use((error, req, res, next) => {
+  if (req.file) {
+    fs.unlink(req.file.path, (err) => {
+      console.log(err);
+    });
+  }
+  if (res.headerSent) {
+    return next(error);
+  }
+  res.status(error.code || 500);
+  res.json({ message: error.message || "An unknown error occurred!" });
+});
+
 app.use(usersRoute);
 
 mongoose

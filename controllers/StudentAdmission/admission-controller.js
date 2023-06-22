@@ -1,5 +1,6 @@
 const HttpError = require("../../models/http-error");
 const Student = require("../../models/studentDB");
+const User = require("../../models/user");
 const getAdmission = (req, res, next) => {
   res.json({ message: "admission route" });
 };
@@ -17,6 +18,7 @@ const getStudentsList = async (req, res, next) => {
     students: students.map((student) => student.toObject({ getters: true })),
   });
 };
+
 const admitStudent = async (req, res, next) => {
   const {
     firstName,
@@ -36,24 +38,23 @@ const admitStudent = async (req, res, next) => {
     province,
     street,
     houseNumber,
-    // siblingGrade,
-    // siblingSection,
-    // siblingName,
   } = req.body;
 
-  // console.log(req.body);
+  let existingEmail = await User.findOne({ email: email });
+  if (existingEmail) {
+    res.send(new HttpError("Email Exists", 404));
+    return;
+  }
 
   let existingUser;
   try {
     existingUser = await Student.findOne({ email: email });
   } catch (err) {
     console.log("error looking for email to create student");
-    // return;
   }
 
   if (existingUser) {
-    res.send(new HttpError("userAlready Exists", 404));
-    console.log("userAlready Exists");
+    res.send(new HttpError("Email Exists", 404));
     return;
   }
 
@@ -75,9 +76,6 @@ const admitStudent = async (req, res, next) => {
     province,
     street,
     houseNumber,
-    // siblingGrade,
-    // siblingSection,
-    // siblingName,
   });
 
   try {
@@ -89,7 +87,6 @@ const admitStudent = async (req, res, next) => {
 };
 
 const updateStudent = async (req, res, next) => {
-  // console.log(req.body);
   const {
     firstNameExisiting,
     lastNameExisiting,
@@ -108,11 +105,13 @@ const updateStudent = async (req, res, next) => {
     provinceExisiting,
     streetExisiting,
     houseNumberExisiting,
-    // siblingGradeExisiting,
-    // siblingSectionExisiting,
-    // siblingNameExisiting,
   } = req.body;
 
+  let existingEmail = await User.findOne({ email: emailExisiting });
+  if (existingEmail) {
+    res.send(new HttpError("Email Exists", 404));
+    return;
+  }
   let existingUser;
   try {
     existingUser = await Student.findOne({
@@ -152,9 +151,6 @@ const updateStudent = async (req, res, next) => {
         province: provinceExisiting,
         street: streetExisiting,
         houseNumber: houseNumberExisiting,
-        // siblingGradeExisiting,
-        // siblingSectionExisiting,
-        // siblingNameExisiting,
       }
     );
     console.log(student);

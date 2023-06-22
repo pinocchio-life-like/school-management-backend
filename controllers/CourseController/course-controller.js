@@ -20,7 +20,6 @@ const getCourses = async (req, res, next) => {
 
 const registerCourse = async (req, res, next) => {
   const { courseName, grade, courseId, offered, teacherId } = req.body;
-  //   console.log(req.body);
   let existingCourse;
   try {
     existingCourse = await Course.findOne({

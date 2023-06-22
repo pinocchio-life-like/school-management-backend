@@ -19,7 +19,6 @@ const admitIndividual = async (req, res, next) => {
     const student = await Student.findOne({
       admissionNumber: req.body.admissionNumber,
     });
-    // console.log(student);
     await CalenderYear.updateOne(
       {
         year: req.body.year,
@@ -85,90 +84,6 @@ const admitIndividual = async (req, res, next) => {
   res.status(201).json({ message: "successfully admitted" });
 };
 
-const admitMultiple = async (req, res, next) => {
-  const admissionNumber = req.body.admissionNumber;
-  // console.log(admissionNumber.length);
-  try {
-    let courses = await Course.find();
-    courses = courses.filter((data) => {
-      return data.offered === "Offered" && data.grade === req.body.grade;
-    });
-
-    for (let i = 0; i < admissionNumber.length; i++) {
-      await Student.updateOne(
-        { admissionNumber: admissionNumber[i] },
-        {
-          $set: {
-            admissionStatus: "admitted",
-          },
-        }
-      );
-      await CalenderYear.updateOne(
-        {
-          year: req.body.year,
-          grade: req.body.grade,
-        },
-        {
-          $set: {
-            year: req.body.year,
-            grade: req.body.grade,
-          },
-          $push: { studentsId: admissionNumber[i] },
-        },
-        {
-          upsert: true,
-        }
-      );
-
-      const student = await Student.findOne({
-        admissionNumber: admissionNumber[i],
-      });
-
-      for (let j = 0; j < courses.length; j++) {
-        const mark = new Mark({
-          markId: admissionNumber[i],
-          studentName: `${student.firstName} ${student.lastName}`,
-          courseId: courses[j].courseId,
-          year: req.body.year,
-          grade: req.body.grade,
-          section: student.section,
-          firstSemister: [
-            {
-              mark1: 0,
-              mark2: 0,
-              mark3: 0,
-              mark4: 0,
-              mark5: 0,
-              final: 0,
-            },
-          ],
-          secondSemister: [
-            {
-              mark1: 0,
-              mark2: 0,
-              mark3: 0,
-              mark4: 0,
-              mark5: 0,
-              final: 0,
-            },
-          ],
-        });
-        const existingMark = await Mark.findOne({
-          markId: admissionNumber[i],
-          courseId: courses[j].courseId,
-        });
-        if (!existingMark) {
-          await mark.save();
-        }
-      }
-    }
-  } catch (err) {
-    console.log(err);
-    res.send(new HttpError("Couldnt admit student", 404));
-  }
-  res.status(201).json({ message: "successfully admitted" });
-};
-
 const expelIndividual = async (req, res, next) => {
   try {
     await Student.updateOne(
@@ -199,5 +114,4 @@ const expelIndividual = async (req, res, next) => {
 };
 exports.calenderList = calenderList;
 exports.admitIndividual = admitIndividual;
-exports.admitMultiple = admitMultiple;
 exports.expelIndividual = expelIndividual;
