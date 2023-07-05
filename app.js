@@ -16,6 +16,9 @@ const feeRouter = require("./Routes/fee-route");
 const jobRouter = require("./Routes/job-route");
 const employeeRouter = require("./Routes/employee-route");
 const payrollRouter = require("./Routes/payroll-route");
+const vehicleRouter = require("./Routes/vehicle-route");
+const VehicleDirection = require("./Routes/vehicleRoute-route");
+const assignVehicleRouter = require("./Routes/assignVehicle-route");
 
 // app.use(bodyParser.urlencoded({ extended: false }));
 app.use(
@@ -49,6 +52,9 @@ app.use(feeRouter);
 app.use(jobRouter);
 app.use(employeeRouter);
 app.use(payrollRouter);
+app.use(vehicleRouter);
+app.use(VehicleDirection);
+app.use(assignVehicleRouter);
 
 app.use("/uploads/resume", express.static(path.join("uploads", "resume")));
 
